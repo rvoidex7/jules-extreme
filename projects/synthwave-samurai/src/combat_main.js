@@ -1,5 +1,7 @@
 // Three.js'i CDN üzerinden, Skypack kullanarak içe aktar
 import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+// Tween.js'i de CDN'den import et
+import TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js@18.6.4';
 
 // --- Sahne Kurulumu ---
 const scene = new THREE.Scene();
@@ -8,7 +10,6 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 camera.position.z = 15;
 
 // --- Temel Işıklandırma ---
@@ -37,38 +38,25 @@ const originalPlayerPosition = player.position.clone();
 function attack() {
     if (isAttacking) return;
     isAttacking = true;
-
     player.material.color.set(0xff0000); // Kırmızıya dön
-
-    // Basit bir ileri atılma ve geri dönme animasyonu
     const forwardPosition = new THREE.Vector3(player.position.x, player.position.y, player.position.z - 2);
-
-    // Animasyon süresi
     const duration = 150; // ms
 
-    // İleri hareket
     new TWEEN.Tween(player.position)
         .to(forwardPosition, duration / 2)
         .easing(TWEEN.Easing.Quadratic.Out)
         .onComplete(() => {
-            // Geri hareket
             new TWEEN.Tween(player.position)
                 .to(originalPlayerPosition, duration / 2)
                 .easing(TWEEN.Easing.Quadratic.In)
                 .onComplete(() => {
-                    player.material.color.copy(originalPlayerColor); // Rengi geri al
+                    player.material.color.copy(originalPlayerColor);
                     isAttacking = false;
                 })
                 .start();
         })
         .start();
 }
-
-// Tween.js'i de CDN'den import etmemiz gerekiyor. Onu script'e ekliyorum.
-const tweenScript = document.createElement('script');
-tweenScript.src = "https://cdn.skypack.dev/@tweenjs/tween.js@18.6.4/dist/tween.umd.js";
-document.body.appendChild(tweenScript);
-
 
 window.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
@@ -79,12 +67,7 @@ window.addEventListener('keydown', (event) => {
 // --- Oyun Döngüsü ---
 function animate() {
     requestAnimationFrame(animate);
-
-    // Tween'i güncelle
-    if (window.TWEEN) {
-        TWEEN.update();
-    }
-
+    TWEEN.update();
     renderer.render(scene, camera);
 }
 
