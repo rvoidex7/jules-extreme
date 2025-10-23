@@ -1,3 +1,1 @@
-#!/bin/bash
-echo "Bu araç, NPM bağımlılığı olan playwright kullandığı için bu ortamda çalışmamaktadır."
-exit 1
+#!/bin/bash\npip install -r "$(dirname "$0")/requirements.txt"\npython "$(dirname "$0")/run.py" "$@"

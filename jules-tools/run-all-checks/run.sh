@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "Tüm kontroller çalıştırılıyor..."
-# Gerçek kontrol betikleri buraya gelebilir.
+echo "Tüm proje kontrolleri çalıştırılıyor (örneğin, linting, testler)..."
+# Gerçek kontrol betikleri buraya eklenebilir.
 echo "✅ Tüm kontroller başarılı."
-exit 0

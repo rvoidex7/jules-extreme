@@ -38,7 +38,7 @@ Bu rapor, "Jules'un Büyük Testi" görevi sırasında karşılaşılan ve geli�
 Bu sorunlara karşı aşağıdaki pragmatik çözümler geliştirilmiş ve gelecekteki çalışmalar için standart hale getirilmesi önerilmektedir:
 
 **1. Kural: "Sıfır Yerel Bağımlılık" Politikası**
-- **Açıklama:** `npm` ve `node_modules` tamamen terk edilmelidir. Tüm harici kütüphaneler (Three.js, TWEEN.js vb.) güvenilir CDN'ler (örn: Skack, jsDelivr) üzerinden, doğrudan HTML içinde `<script type="module">` etiketleriyle içe aktarılmalıdır.
+- **Açıklama:** `npm` ve `node_modules` tamamen terk edilmelidir. Tüm harici kütüphaneler (Three.js, TWEEN.js vb.) güvenilir CDN'ler (örn: Skypack, jsDelivr) üzerinden, doğrudan HTML içinde `<script type="module">` etiketleriyle içe aktarılmalıdır.
 - **Gerekçe:** Bu, "Maksimum Dosya Sayısı" limitini aşmanın tek yoludur.
 
 **2. Kural: "Python ile Basit Sunucu"**
