@@ -1,8 +1,6 @@
 // Three.js'i CDN üzerinden, Skypack kullanarak içe aktar
 import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
 
-console.log("Bağımlılıklar CDN üzerinden yüklendi. Synthwave Samurai motoru başlatılıyor...");
-
 // --- Sahne Kurulumu ---
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0a0a);
@@ -25,54 +23,67 @@ const gridHelper = new THREE.GridHelper(100, 100, 0x880088, 0x444444);
 scene.add(gridHelper);
 
 // --- Oyun Nesneleri ---
-const playerGeometry = new THREE.BoxGeometry();
-const playerMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-const player = new THREE.Mesh(playerGeometry, playerMaterial);
-player.position.set(0, 0.5, 0);
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+const player = new THREE.Mesh(geometry, material);
+player.position.y = 0.5;
 scene.add(player);
 
-const npcGeometry = new THREE.BoxGeometry();
-const npcMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff }); // NPC'nin rengi mavi
-const npc = new THREE.Mesh(npcGeometry, npcMaterial);
-npc.position.set(5, 0.5, 0); // NPC'nin pozisyonu
-scene.add(npc);
+// --- Kontroller ve Savaş Mekaniği ---
+let isAttacking = false;
+const originalPlayerColor = player.material.color.clone();
+const originalPlayerPosition = player.position.clone();
 
-console.log("Oyuncu ve NPC sahneye eklendi.");
+function attack() {
+    if (isAttacking) return;
+    isAttacking = true;
 
-// --- Diyalog Sistemi ---
-const dialogueBox = document.getElementById('dialogue-box');
-const interactionDistance = 3; // Etkileşim mesafesi
+    player.material.color.set(0xff0000); // Kırmızıya dön
 
-function checkInteraction() {
-    const distance = player.position.distanceTo(npc.position);
-    if (distance <= interactionDistance) {
-        dialogueBox.style.display = 'block';
-    } else {
-        dialogueBox.style.display = 'none';
+    // Basit bir ileri atılma ve geri dönme animasyonu
+    const forwardPosition = new THREE.Vector3(player.position.x, player.position.y, player.position.z - 2);
+
+    // Animasyon süresi
+    const duration = 150; // ms
+
+    // İleri hareket
+    new TWEEN.Tween(player.position)
+        .to(forwardPosition, duration / 2)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onComplete(() => {
+            // Geri hareket
+            new TWEEN.Tween(player.position)
+                .to(originalPlayerPosition, duration / 2)
+                .easing(TWEEN.Easing.Quadratic.In)
+                .onComplete(() => {
+                    player.material.color.copy(originalPlayerColor); // Rengi geri al
+                    isAttacking = false;
+                })
+                .start();
+        })
+        .start();
+}
+
+// Tween.js'i de CDN'den import etmemiz gerekiyor. Onu script'e ekliyorum.
+const tweenScript = document.createElement('script');
+tweenScript.src = "https://cdn.skypack.dev/@tweenjs/tween.js@18.6.4/dist/tween.umd.js";
+document.body.appendChild(tweenScript);
+
+
+window.addEventListener('keydown', (event) => {
+    if (event.code === 'Space') {
+        attack();
     }
-}
-
-// --- Kontroller (Basit Oyuncu Hareketi) ---
-const moveSpeed = 0.1;
-const keys = {};
-window.addEventListener('keydown', (event) => keys[event.code] = true);
-window.addEventListener('keyup', (event) => keys[event.code] = false);
-
-function handleControls() {
-    if (keys['ArrowUp']) player.position.z -= moveSpeed;
-    if (keys['ArrowDown']) player.position.z += moveSpeed;
-    if (keys['ArrowLeft']) player.position.x -= moveSpeed;
-    if (keys['ArrowRight']) player.position.x += moveSpeed;
-}
-
-console.log("Kontroller hazır. Oyuncuyu ok tuşlarıyla hareket ettirin.");
+});
 
 // --- Oyun Döngüsü ---
 function animate() {
     requestAnimationFrame(animate);
 
-    handleControls(); // Oyuncu hareketini işle
-    checkInteraction(); // NPC ile etkileşimi kontrol et
+    // Tween'i güncelle
+    if (window.TWEEN) {
+        TWEEN.update();
+    }
 
     renderer.render(scene, camera);
 }
@@ -84,5 +95,4 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-console.log("Oyun döngüsü başlatıldı.");
 animate();
