@@ -1,9 +1,7 @@
 // Three.js'i CDN üzerinden, Skypack kullanarak içe aktar
 import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
-
 // Tween.js'i de CDN'den import et
 import TWEEN from 'https://cdn.skypack.dev/@tweenjs/tween.js@18.6.4';
-
 
 // --- Sahne Kurulumu ---
 const scene = new THREE.Scene();
@@ -12,7 +10,6 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 camera.position.z = 15;
 
 // --- Temel Işıklandırma ---
@@ -41,11 +38,8 @@ const originalPlayerPosition = player.position.clone();
 function attack() {
     if (isAttacking) return;
     isAttacking = true;
-
     player.material.color.set(0xff0000); // Kırmızıya dön
-
     const forwardPosition = new THREE.Vector3(player.position.x, player.position.y, player.position.z - 2);
-
     const duration = 150; // ms
 
     new TWEEN.Tween(player.position)
@@ -64,7 +58,6 @@ function attack() {
         .start();
 }
 
-
 window.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
         attack();
@@ -74,9 +67,7 @@ window.addEventListener('keydown', (event) => {
 // --- Oyun Döngüsü ---
 function animate() {
     requestAnimationFrame(animate);
-
     TWEEN.update();
-
     renderer.render(scene, camera);
 }
 

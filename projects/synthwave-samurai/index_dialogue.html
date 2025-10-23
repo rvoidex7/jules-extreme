@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthwave Samurai - Dialogue System</title>
+    <style>
+        body { margin: 0; background-color: #000; overflow: hidden; }
+        canvas { display: block; }
+        #dialogue-box {
+            display: none; /* Başlangıçta gizli */
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(0, 0, 20, 0.8);
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="dialogue-box">Merhaba, Samuray. Şehre hoş geldin.</div>
+    <!-- Dialogue System prototipi bu dosyayı kullanır -->
+    <script type="module" src="./src/dialogue_main.js"></script>
+</body>
+</html>

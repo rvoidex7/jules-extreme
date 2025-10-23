@@ -6,19 +6,17 @@ Bu rapor, "Jules'un Büyük Testi" görevi kapsamında yürütülen çalışmala
 
 ## 2. Geliştirilen Varyantlar
 
-İki farklı oyun mekaniği prototipi geliştirildi:
+İki farklı oyun mekaniği prototipi geliştirildi ve kodları kurtarıldı:
 
 ### a. Varyant A: Savaş Sistemi Prototipi
-
 - **Açıklama:** Anlık ve aksiyon odaklı bir mekaniği test eder.
 - **İşlevsellik:** Kullanıcı "Boşluk" tuşuna bastığında, karakter bir saldırı animasyonu gerçekleştirir.
-- **Konum:** `projects/synthwave-samurai/`
+- **Konum:** `projects/synthwave-samurai/index_combat.html`
 
 ### b. Varyant B: Diyalog Sistemi Prototipi
-
 - **Açıklama:** Durumsal ve etkileşim odaklı bir mekaniği test eder.
 - **İşlevsellik:** Oyuncu, bir NPC'ye yaklaştığında ekranda bir diyalog kutusu belirir.
-- **Not:** Bu varyantın kodu, `commit` edilemediği için kaybolmuştur ancak talep üzerine yeniden oluşturulabilir.
+- **Konum:** `projects/synthwave-samurai/index_dialogue.html`
 
 ## 3. Temel Sonuç
 

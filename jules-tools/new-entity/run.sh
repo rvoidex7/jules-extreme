@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e; ENTITY_NAME="";
 while [[ "$#" -gt 0 ]]; do case $1 in --name) ENTITY_NAME="$2"; shift ;; *) exit 1 ;; esac; shift; done
-if [ -z "$ENTITY_NAME" ]; then exit 1; fi; DEST_DIR="src/entities"; FILE_PATH="${DEST_DIR}/${ENTITY_NAME}.js";
+if [ -z "$ENTITY_NAME" ]; then exit 1; fi; DEST_DIR="projects/synthwave-samurai/src/entities"; FILE_PATH="${DEST_DIR}/${ENTITY_NAME}.js";
 mkdir -p "$DEST_DIR"; if [ -f "$FILE_PATH" ]; then echo "File exists."; exit 1; fi
 cat > "$FILE_PATH" << EOL
 import * as THREE from 'three';
