@@ -1,0 +1,69 @@
+/* --- Jules Wireframe CSS --- */
+/* This stylesheet intentionally strips all aesthetics to focus on structure and layout. */
+
+* {
+    /* Reset all colors to a simple grayscale palette */
+    color: #000 !important;
+    background-color: #FFF !important;
+    background-image: none !important;
+
+    /* Remove all stylistic shadows and rounded corners */
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    /* Use a monospaced font for a technical, "blueprint" feel */
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    text-shadow: none !important;
+
+    /* Add a clear border to every element to show its boundaries */
+    border: 1px solid #CCC !important;
+
+    /* Reset spacing to be consistent */
+    margin: 4px !important;
+    padding: 8px !important;
+}
+
+/* Make sure the body takes up the full space */
+html, body {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Style common elements to be recognizable but not "designed" */
+button, input, select, textarea {
+    background-color: #F0F0F0 !important;
+    border: 2px solid #333 !important;
+}
+
+button::before,
+input::before,
+select::before {
+    content: attr(aria-label) " (" attr(data-jules-type) ") " !important;
+    display: block;
+    font-weight: bold;
+    color: #333;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    border-bottom: 2px solid #000 !important;
+    padding-bottom: 10px !important;
+}
+
+a {
+    color: #000 !important;
+    text-decoration: underline !important;
+}
+
+img, svg {
+    /* Replace images/icons with a placeholder box */
+    background-color: #DDD !important;
+    border: 1px dashed #999 !important;
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    color: transparent !important; /* Hide any alt text inside the box */
+}
