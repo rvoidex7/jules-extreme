@@ -2,108 +2,126 @@ import svgwrite
 import argparse
 import re
 
-# --- Constants ---
-VALID_COLORS = {
-    "kırmızı": "red", "mavi": "blue", "yeşil": "green", "sarı": "yellow",
-    "siyah": "black", "beyaz": "white", "mor": "purple", "turuncu": "orange"
+# --- Sanatçı Ayarları ve Palet ---
+# Renkler, daha yumuşak ve anime tarzına uygun olacak şekilde güncellendi.
+PALETTE = {
+    "cilt": "#f2d3b3",
+    "saç": "#8c5b98",  # Varsayılan mor saç
+    "göz": "#4a7a9d",    # Varsayılan mavi göz
+    "kıyafet": "#e0a5c3",
+    "kontur": "black",
 }
-VALID_SHAPES = ["daire", "kare", "üçgen", "dikdörtgen"]
 
-# --- Core Functions ---
+# --- Gelişmiş Prompt Analizi ---
 
-def parse_simple_prompt(prompt):
+def parse_anime_prompt(prompt):
     """
-    Parses a simple prompt like "bir kırmızı daire ve mavi bir kare çiz"
-    into a list of drawing instructions.
+    "mor saçlı mavi gözlü bir anime kızı" gibi bir prompt'u analiz eder
+    ve çizim için bir özellikler sözlüğü döndürür.
     """
-    instructions = []
-    # Use regex to find patterns like "[color] [shape]"
-    # This is a very basic parser and can be improved significantly.
-
-    # Normalize prompt
     prompt = prompt.lower()
+    attributes = {
+        "saç_rengi": PALETTE["saç"],
+        "göz_rengi": PALETTE["göz"]
+    }
 
-    # Split the prompt by "ve", "ile" etc. to handle multiple objects
-    parts = re.split(r'\s+ve\s+|\s+ile\s+', prompt)
+    # Renk ve özellik eşleştirmesi
+    renk_map = {
+        "kırmızı": "red", "mavi": "#4a7a9d", "yeşil": "#6a9a69", "sarı": "yellow",
+        "siyah": "black", "beyaz": "white", "mor": "#8c5b98", "pembe": "#e0a5c3",
+        "kahverengi": "#8b4513"
+    }
 
-    x, y = 150, 150 # Starting coordinates for drawing
+    # "mavi gözlü", "mor saçlı" gibi kalıpları bul
+    göz_match = re.search(r'(\w+)\s+göz', prompt)
+    if göz_match and göz_match.group(1) in renk_map:
+        attributes["göz_rengi"] = renk_map[göz_match.group(1)]
 
-    for part in parts:
-        color = None
-        shape = None
+    saç_match = re.search(r'(\w+)\s+saç', prompt)
+    if saç_match and saç_match.group(1) in renk_map:
+        attributes["saç_rengi"] = renk_map[saç_match.group(1)]
 
-        for word in part.split():
-            if word in VALID_COLORS:
-                color = VALID_COLORS[word]
-            if word in VALID_SHAPES:
-                shape = word
+    return attributes
 
-        if color and shape:
-            instructions.append({
-                "shape": shape,
-                "color": color,
-                "x": x,
-                "y": y
-            })
-            x += 250 # Move to the next position for the next shape
-            if x > 600:
-                x = 150
-                y += 250
+# --- Programatik Çizim Fonksiyonları ---
 
-    return instructions
+def ciz_kafa(dwg, x, y):
+    """Kafa şeklini ve boynunu çizer."""
+    # Kafa
+    dwg.add(dwg.circle(center=(x, y), r=150, fill=PALETTE["cilt"], stroke=PALETTE["kontur"], stroke_width=4))
+    # Boyun
+    dwg.add(dwg.rect(insert=(x - 40, y + 140), size=(80, 100), fill=PALETTE["cilt"], stroke=PALETTE["kontur"], stroke_width=4))
 
-def render_elements(dwg, instructions):
-    """
-    Renders a list of drawing instructions onto the SVG canvas.
-    """
-    for inst in instructions:
-        shape = inst["shape"]
-        color = inst["color"]
-        x = inst["x"]
-        y = inst["y"]
+def ciz_gözler(dwg, x, y, renk):
+    """Bir çift anime gözü çizer."""
+    # Sol Göz
+    sol_göz_x = x - 60
+    dwg.add(dwg.ellipse(center=(sol_göz_x, y), r=(35, 50), fill='white', stroke=PALETTE["kontur"], stroke_width=3))
+    dwg.add(dwg.circle(center=(sol_göz_x, y + 5), r=25, fill=renk))
+    dwg.add(dwg.circle(center=(sol_göz_x - 8, y - 5), r=8, fill='white')) # Işık yansıması
 
-        if shape == "daire":
-            dwg.add(dwg.circle(center=(x, y), r=100, fill=color, stroke='black', stroke_width=3))
-        elif shape == "kare":
-            dwg.add(dwg.rect(insert=(x - 100, y - 100), size=('200px', '200px'), fill=color, stroke='black', stroke_width=3))
-        elif shape == "dikdörtgen":
-            dwg.add(dwg.rect(insert=(x - 150, y - 100), size=('300px', '200px'), fill=color, stroke='black', stroke_width=3))
-        elif shape == "üçgen":
-            # Simple equilateral triangle
-            points = [(x, y - 100), (x - 86.6, y + 50), (x + 86.6, y + 50)]
-            dwg.add(dwg.polygon(points, fill=color, stroke='black', stroke_width=3))
+    # Sağ Göz
+    sağ_göz_x = x + 60
+    dwg.add(dwg.ellipse(center=(sağ_göz_x, y), r=(35, 50), fill='white', stroke=PALETTE["kontur"], stroke_width=3))
+    dwg.add(dwg.circle(center=(sağ_göz_x, y + 5), r=25, fill=renk))
+    dwg.add(dwg.circle(center=(sağ_göz_x + 8, y - 5), r=8, fill='white')) # Işık yansıması
+
+def ciz_ağız(dwg, x, y):
+    """Basit bir gülümseyen ağız çizer."""
+    path = svgwrite.path.Path(d=f"M {x-40},{y+80} Q {x},{y+100} {x+40},{y+80}", stroke=PALETTE["kontur"], fill='none', stroke_width=3)
+    dwg.add(path)
+
+def ciz_saç(dwg, x, y, renk):
+    """Anime tarzı saç çizer."""
+    # Katman 1: Arka Saç
+    dwg.add(dwg.circle(center=(x, y), r=160, fill=renk, stroke=PALETTE["kontur"], stroke_width=4))
+    # Katman 2: Kahküller
+    dwg.add(dwg.path(d=f"M {x-160},{y-20} C {x-80},{y-150} {x+80},{y-150} {x+160},{y-20} Z", fill=renk, stroke=PALETTE["kontur"], stroke_width=4))
+    # Katman 3: Yan Saçlar
+    dwg.add(dwg.polygon(points=[(x-120, y-100), (x-220, y+150), (x-100, y+100)], fill=renk, stroke=PALETTE["kontur"], stroke_width=4))
+    dwg.add(dwg.polygon(points=[(x+120, y-100), (x+220, y+150), (x+100, y+100)], fill=renk, stroke=PALETTE["kontur"], stroke_width=4))
+
+def ciz_kıyafet(dwg, x, y):
+    """Basit bir kıyafet üstü çizer."""
+    dwg.add(dwg.rect(insert=(x - 120, y + 240), size=(240, 150), fill=PALETTE["kıyafet"], stroke=PALETTE["kontur"], stroke_width=4))
 
 def parse_arguments():
-    """Parses command-line arguments."""
-    parser = argparse.ArgumentParser(description="Jules's Generative Canvas")
-    parser.add_argument("--prompt", type=str, required=True, help="Text prompt describing the art to be generated.")
-    parser.add_argument("--output", type=str, required=True, help="Base name for the output files (without extension).")
+    """Komut satırı argümanlarını ayrıştırır."""
+    parser = argparse.ArgumentParser(description="Jules'un Üretken Tuvali")
+    parser.add_argument("--prompt", type=str, required=True, help="Oluşturulacak sanatı tanımlayan metin prompt'u.")
+    parser.add_argument("--output", type=str, required=True, help="Çıktı dosyaları için temel ad (uzantısız).")
     return parser.parse_args()
 
 def main():
-    """Main function to generate the SVG art."""
+    """SVG sanatını oluşturmak için ana fonksiyon."""
     args = parse_arguments()
 
-    print(f"🎨 Generating art for prompt: '{args.prompt}'")
+    print(f"🎨 '{args.prompt}' prompt'u için sanat oluşturuluyor...")
 
-    # --- Parse the prompt ---
-    instructions = parse_simple_prompt(args.prompt)
-    if not instructions:
-        print("⚠️ Prompt anlaşılamadı. Lütfen 'bir [renk] [şekil]' formatında bir komut girin.")
+    # --- Prompt'u Analiz Et ---
+    attributes = parse_anime_prompt(args.prompt)
+    if not attributes:
+        print("⚠️ Prompt anlaşılamadı. Lütfen 'mor saçlı mavi gözlü bir anime kızı' gibi bir tanım girin.")
         return
 
-    # --- SVG Canvas Setup ---
+    # --- SVG Tuval Kurulumu ---
     output_svg_path = f"{args.output}.svg"
-    dwg = svgwrite.Drawing(output_svg_path, profile='tiny', size=('800px', '800px'))
-    dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'), fill='white')) # White background
+    dwg = svgwrite.Drawing(output_svg_path, profile='full', size=('800px', '800px'))
+    dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'), fill='#f0f0f0')) # Arka plan
 
-    # --- Render the elements from instructions ---
-    render_elements(dwg, instructions)
+    # --- Katmanlı Çizim ---
+    # Çizim sırası önemlidir (arkadan öne).
+    merkez_x, merkez_y = 400, 300
+    ciz_saç(dwg, merkez_x, merkez_y, attributes["saç_rengi"])
+    ciz_kıyafet(dwg, merkez_x, merkez_y)
+    ciz_kafa(dwg, merkez_x, merkez_y)
+    ciz_gözler(dwg, merkez_x, merkez_y, attributes["göz_rengi"])
+    ciz_ağız(dwg, merkez_x, merkez_y)
 
-    # --- Save the SVG file ---
+    # --- SVG Dosyasını Kaydet ---
     dwg.save()
 
-    print(f"✅ SVG file successfully saved to: {output_svg_path}")
+    print(f"✅ SVG dosyası başarıyla kaydedildi: {output_svg_path}")
 
 if __name__ == "__main__":
     main()
