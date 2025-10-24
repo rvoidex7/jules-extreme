@@ -1,54 +1,47 @@
 #!/bin/bash
+set -e
 
-# A simple argument parser for the Tireless Researcher tool.
-# This script is a skeleton and will be expanded with the core logic later.
-
-# --- Default Values ---
-OPTIMIZATION_GOAL="performans"
-TASK_PROMPT=""
+# --- Parametreleri Ayrıştırma ---
+PROMPT=""
 DEADLINE=""
-
-# --- Helper function for usage message ---
-usage() {
-    echo "Usage: $0 --task-prompt <prompt> --deadline <YYYY-MM-DD HH:MM:SS> [--optimization-goal <goal>]"
-    echo ""
-    echo "Arguments:"
-    echo "  --task-prompt         Required. A detailed description of the task for Jules."
-    echo "  --deadline            Required. The exact UTC timestamp when the work must stop."
-    echo "  --optimization-goal   Optional. The primary goal of the optimization. Defaults to 'performans'."
-    echo "                        (e.g., okunabilirlik, güvenlik, kod-kisaligi)"
-    exit 1
-}
-
-# --- Parse Command-Line Arguments ---
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --task-prompt) TASK_PROMPT="$2"; shift ;;
+        --prompt) PROMPT="$2"; shift ;;
         --deadline) DEADLINE="$2"; shift ;;
-        --optimization-goal) OPTIMIZATION_GOAL="$2"; shift ;;
-        -h|--help) usage ;;
-        *) echo "Unknown parameter passed: $1"; usage ;;
+        *) echo "Bilinmeyen parametre: $1"; exit 1 ;;
     esac
     shift
 done
 
-# --- Validate Required Arguments ---
-if [ -z "$TASK_PROMPT" ] || [ -z "$DEADLINE" ]; then
-    echo "Error: Missing required arguments."
-    usage
+if [ -z "$PROMPT" ] || [ -z "$DEADLINE" ]; then
+    echo "Kullanım: $0 --prompt \"görev tanımı\" --deadline \"<süre>h\""
+    exit 1
 fi
 
-# --- Echo parsed values to confirm ---
-echo "✅ Tool started with the following parameters:"
-echo "--------------------------------------------------"
-echo "Görev Tanımı (Task Prompt): $TASK_PROMPT"
-echo "Bitiş Zamanı (Deadline):   $DEADLINE"
-echo "Optimizasyon Hedefi (Goal): $OPTIMIZATION_GOAL"
-echo "--------------------------------------------------"
-echo ""
-echo "Bu betik şu anda bir iskelettir. Gelecekte ana araştırma mantığı buraya eklenecektir."
+# --- Görev Altyapısını Hazırlama ---
+TOOL_DIR=$(dirname "$0")
+TASK_ID=$(date +%Y%m%d-%H%M%S)-$(uuidgen | cut -d'-' -f1)
+TASK_DIR="${TOOL_DIR}/tasks/${TASK_ID}"
+LOG_FILE="${TASK_DIR}/progress.log"
+WORKER_SCRIPT="${TOOL_DIR}/worker.sh"
 
-# TODO: Add the core logic of the Tireless Researcher here.
-# 1. Start a loop that runs until the DEADLINE.
-# 2. Inside the loop, generate and test code variants.
-# 3. Store results in the 'variants' and 'reports' directories.
+mkdir -p "$TASK_DIR"
+
+# --- Çalışan Betiği (Worker) Arka Plana Atama ---
+echo "--- YORULMAZ ARAŞTIRMACI v2.0 ---" > "$LOG_FILE"
+echo "Görev ID: ${TASK_ID}" | tee -a "$LOG_FILE"
+echo "Başlangıç Zamanı: $(date)" | tee -a "$LOG_FILE"
+echo "Verilen Görev: ${PROMPT}" | tee -a "$LOG_FILE"
+echo "Bitiş Zamanı (Deadline): ${DEADLINE} sonra" | tee -a "$LOG_FILE"
+echo "------------------------------------" | tee -a "$LOG_FILE"
+
+# Worker betiğini, tüm değişkenleri aktararak arka planda çalıştır
+PROMPT="$PROMPT" DEADLINE="$DEADLINE" TASK_ID="$TASK_ID" bash "$WORKER_SCRIPT" >> "$LOG_FILE" 2>&1 &
+
+# --- Kullanıcıya Anında Geri Bildirim ---
+echo "✅ Otonom görev başarıyla arka planda başlatıldı."
+echo "   Görev ID: ${TASK_ID}"
+echo "   İlerlemeyi takip etmek için:"
+echo "   tail -f ${LOG_FILE}"
+echo ""
+exit 0
