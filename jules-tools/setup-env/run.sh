@@ -8,17 +8,23 @@ echo "🚀 Geliştirme ortamı kurulumu başlıyor..."
 echo "--------------------------------------------------"
 
 # Adım 1: Bağımlılıkların Kurulumu
-# Projenizin paket yöneticisine göre bu kısmı düzenleyin (npm, pip, vs.).
 echo "📦 Bağımlılıklar kuruluyor..."
+
+# Node.js projesi kontrolü
 if [ -f "package.json" ]; then
     echo "Node.js projesi algılandı. npm install çalıştırılıyor..."
     # npm install
-elif [ -f "requirements.txt" ]; then
-    echo "Python projesi algılandı. pip install çalıştırılıyor..."
-    # pip install -r requirements.txt
-else
-    echo "⚠️ Proje tipi anlaşılamadı. Bağımlılık kurulumu atlanıyor."
 fi
+
+# Python projesi kontrolü - jules-tools içindeki tüm requirements.txt dosyalarını bul ve kur
+echo "Python bağımlılıkları kontrol ediliyor..."
+find jules-tools -name "requirements.txt" | while read -r req_file; do
+    if [ -f "$req_file" ]; then
+        echo "  -> '$req_file' dosyasından bağımlılıklar kuruluyor..."
+        pip install -r "$req_file"
+        echo "  ✅ '$req_file' için bağımlılıklar kuruldu."
+    fi
+done
 echo "--------------------------------------------------"
 
 
