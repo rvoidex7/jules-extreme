@@ -47,3 +47,15 @@ Bir görev başlatıldıktan sonra, ilerlemesini anlık olarak takip etmek için
 ```bash
 tail -f jules-tools/tireless-researcher/tasks/<görev_id_buraya_gelecek>/progress.log
 ```
+
+## Görev Sonrası Temizlik
+
+Araç, her görev için geçici çalışma dizinleri (`tasks/` ve `variants/` altında) oluşturur. Bir görev tamamlandıktan ve sonuçları incelendikten sonra, bu ara dosyaları `cleanup.sh` betiği ile güvenli bir şekilde silebilirsiniz.
+
+```bash
+./jules-tools/tireless-researcher/cleanup.sh <görev_id_buraya_gelecek>
+```
+
+- `<görev_id>`: (Zorunlu) `run.sh` komutunun size verdiği, temizlenecek görevin kimliği.
+
+Betik, yanlışlıkla veri kaybını önlemek için silme işleminden önce sizden onay isteyecektir.
